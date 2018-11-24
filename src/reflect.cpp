@@ -4,6 +4,7 @@ Eigen::Vector3d reflect(const Eigen::Vector3d & in, const Eigen::Vector3d & n)
 {
   ////////////////////////////////////////////////////////////////////////////
   // Replace with your code here:
-  return Eigen::Vector3d(0,0,0);
+  Eigen::Vector3d along_n_comp = n * (n.dot(-1 * in));
+  return (in + 2 * along_n_comp).normalized();
   ////////////////////////////////////////////////////////////////////////////
 }
