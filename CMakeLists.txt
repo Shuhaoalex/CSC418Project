@@ -2,9 +2,7 @@ cmake_minimum_required(VERSION 2.6)
 project(raytracing)
 
 # Prepare the build environment
-set(LIB_ROOT "${CMAKE_CURRENT_SOURCE_DIR}/library/")
-option(USE_SOLUTION "Use solution"  OFF)
-option(BUILD_TEST "Build test"  OFF)
+set(LIB_ROOT "$library/")
 # Add project files
 include_directories("include/")
 set(SRC_DIR "src/")
