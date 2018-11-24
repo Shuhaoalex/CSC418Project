@@ -2,7 +2,7 @@ cmake_minimum_required(VERSION 2.6)
 project(raytracing)
 
 # Prepare the build environment
-set(SHARED_ROOT "${CMAKE_CURRENT_SOURCE_DIR}/shared/")
+set(LIB_ROOT "${CMAKE_CURRENT_SOURCE_DIR}/library/")
 option(USE_SOLUTION "Use solution"  OFF)
 option(BUILD_TEST "Build test"  OFF)
 # Add project files
@@ -23,4 +23,4 @@ else()
 endif()
 
 add_executable(${PROJECT_NAME} ${SRCFILES} ${LIBIGL_EXTRA_SOURCES})
-target_include_directories(${PROJECT_NAME} SYSTEM PUBLIC ${SHARED_ROOT}/eigen ${SHARED_ROOT}/json)
+target_include_directories(${PROJECT_NAME} SYSTEM PUBLIC ${LIB_ROOT}/eigen-git-mirror ${LIB_ROOT}/json)
