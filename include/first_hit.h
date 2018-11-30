@@ -3,6 +3,7 @@
 
 #include "Ray.h"
 #include "Object.h"
+#include "Material.h"
 #include <Eigen/Core>
 #include <vector>
 #include <memory>
@@ -24,8 +25,12 @@ bool first_hit(
   const Ray & ray, 
   const double min_t,
   const std::vector< std::shared_ptr<Object> > & objects,
-  int & hit_id, 
-  double & t,
-  Eigen::Vector3d & n);
+  Eigen::Vector3d & hit_p,
+  Eigen::Vector3d & n,
+  std::shared_ptr<Material> & material,
+  Eigen::Vector3d & kd,
+  Eigen::Vector3d & ks,
+  Eigen::Vector3d & km,
+  double & p);
 
 #endif

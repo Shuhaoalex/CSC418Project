@@ -31,8 +31,7 @@ inline bool read_json(
 #include "Object.h"
 #include "Sphere.h"
 #include "Plane.h"
-#include "Triangle.h"
-#include "TriangleSoup.h"
+#include "MeshTriangle.h"
 #include "Light.h"
 #include "PointLight.h"
 #include "DirectionalLight.h"
@@ -142,14 +141,6 @@ inline bool read_json(
         plane->point = parse_Vector3d(jobj["point"]);
         plane->normal = parse_Vector3d(jobj["normal"]).normalized();
         objects.push_back(plane);
-      }else if(jobj["type"] == "triangle")
-      {
-        std::shared_ptr<Triangle> tri(new Triangle());
-        tri->corners = std::make_tuple(
-          parse_Vector3d(jobj["corners"][0]),
-          parse_Vector3d(jobj["corners"][1]),
-          parse_Vector3d(jobj["corners"][2]));
-        objects.push_back(tri);
       }else if(jobj["type"] == "soup")
       {
         std::vector<std::vector<double> > V;
@@ -168,18 +159,26 @@ inline bool read_json(
               stl_path,
               V,F,N);
         }
-        std::shared_ptr<TriangleSoup> soup(new TriangleSoup());
-        for(int f = 0;f<F.size();f++)
+        std::vector<std::shared_ptr<Object> > triangles;
+        triangles.reserve(F.rows());
+        // Create a box for each triangle
+        for(int f = 0;f<F.rows();f++)
         {
-          std::shared_ptr<Triangle> tri(new Triangle());
-          tri->corners = std::make_tuple(
-            Eigen::Vector3d( V[F[f][0]][0], V[F[f][0]][1], V[F[f][0]][2]),
-            Eigen::Vector3d( V[F[f][1]][0], V[F[f][1]][1], V[F[f][1]][2]),
-            Eigen::Vector3d( V[F[f][2]][0], V[F[f][2]][1], V[F[f][2]][2])
-          );
-          soup->triangles.push_back(tri);
+          triangles.emplace_back( std::make_shared<MeshTriangle>(V,F,f) );
         }
-        objects.push_back(soup);
+        std::shared_ptr<AABBTree> root = std::make_shared<AABBTree>(triangles);
+        // std::shared_ptr<TriangleSoup> soup(new TriangleSoup());
+        // for(int f = 0;f<F.size();f++)
+        // {
+        //   std::shared_ptr<Triangle> tri(new Triangle());
+        //   tri->corners = std::make_tuple(
+        //     Eigen::Vector3d( V[F[f][0]][0], V[F[f][0]][1], V[F[f][0]][2]),
+        //     Eigen::Vector3d( V[F[f][1]][0], V[F[f][1]][1], V[F[f][1]][2]),
+        //     Eigen::Vector3d( V[F[f][2]][0], V[F[f][2]][1], V[F[f][2]][2])
+        //   );
+        //   soup->triangles.push_back(tri);
+        // }
+        objects.push_back(root);
       }
       //objects.back()->material = default_material;
       if(jobj.count("material"))

@@ -4,6 +4,7 @@
 #include "Material.h"
 #include <Eigen/Core>
 #include <memory>
+#include "BoundingBox.h"
 
 struct Ray;
 class Object
@@ -24,7 +25,16 @@ class Object
     //
     // The funny = 0 just ensures that this function is defined (as a no-op)
     virtual bool intersect(
-        const Ray & ray, const double min_t, double & t, Eigen::Vector3d & n) const = 0;
+      const Ray& ray,
+      const double min_t,
+      Eigen::Vector3d & hit_p,
+      Eigen::Vector3d & n,
+      std::shared_ptr<Material> & material,
+      Eigen::Vector3d & kd,
+      Eigen::Vector3d & ks,
+      Eigen::Vector3d & km,
+      double & p) const = 0;
+    // virtual Eigen::Vector3d get_kd(Eigen::Vector2d & p) const = 0;
 };
 
 #endif

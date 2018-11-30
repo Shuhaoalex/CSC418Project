@@ -1,8 +1,16 @@
+#ifndef MESH_TRIANGLE_H
+#define MESH_TRIANGLE_H
+
+#include "Object.h"
+#include <Eigen/Core>
 #include <memory>
+#include "BoundingBox.h"
+#include "Material.h"
 
 struct MeshTriangle : public Object
 {
   public:
+    BoundingBox box;
     // Pointer to mesh vertex position list
     const Eigen::MatrixXd & V;
     // Pointer to mesh indices list
@@ -20,50 +28,18 @@ struct MeshTriangle : public Object
     inline MeshTriangle(
       const Eigen::MatrixXd & V,
       const Eigen::MatrixXi & F,
-      const int f);
+      const int f,
+      const std::shared_ptr<Material> mat);
     // Object implementations (see Object.h)
-    inline bool ray_intersect(
+    inline bool intersect(
       const Ray& ray,
       const double min_t,
-      const double max_t,
-      double & t,
-      std::shared_ptr<Object> & descendant) const override;
+      Eigen::Vector3d & hit_p,
+      Eigen::Vector3d & n,
+      std::shared_ptr<Material> & material,
+      Eigen::Vector3d & kd,
+      Eigen::Vector3d & ks,
+      Eigen::Vector3d & km,
+      double & p) const override;
 };
-
-
-// Implementation
-
-#include "insert_triangle_into_box.h"
-#include "ray_intersect_triangle.h"
-#include "point_triangle_squared_distance.h"
-
-inline MeshTriangle::MeshTriangle(
-    const Eigen::MatrixXd & _V,
-    const Eigen::MatrixXi & _F,
-    const int _f): V(_V), F(_F), f(_f)
-{
-  insert_triangle_into_box(
-    V.row(F(f,0)),
-    V.row(F(f,1)),
-    V.row(F(f,2)),
-    box);
-}
-
-// Simple wrapper around `ray_intersect_triangle`
-inline bool MeshTriangle::ray_intersect(
-  const Ray& ray,
-  const double min_t,
-  const double max_t,
-  double & t,
-  std::shared_ptr<Object> & descendant) const
-{
-  // descendant doesn't make sense so it's not touched
-  return ray_intersect_triangle(
-    ray,
-    V.row(F(f,0)),
-    V.row(F(f,1)),
-    V.row(F(f,2)),
-    min_t,
-    max_t,
-    t);
-}
+#endif
