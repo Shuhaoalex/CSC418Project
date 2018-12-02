@@ -23,13 +23,14 @@ class Plane : public Object
   inline bool intersect(
       const Ray& ray,
       const double min_t,
+      double & t,
       Eigen::Vector3d & hit_p,
       Eigen::Vector3d & n,
-      std::shared_ptr<Material> & material,
+      std::shared_ptr<Material> & mat,
       Eigen::Vector3d & kd,
       Eigen::Vector3d & ks,
       Eigen::Vector3d & km,
-      double & p) const override;
+      double & p) const;
 };
 
 #endif

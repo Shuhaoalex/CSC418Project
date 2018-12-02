@@ -2,14 +2,13 @@
 #define MESHTREE_H
 
 #include "BoundingBox.h"
-#include "Object.h"
+#include "MeshTriangle.h"
 #include <Eigen/Core>
 #include <memory>
 #include <vector>
 
 // Implementation
 #include "ray_intersect_box.h"
-#include "point_box_squared_distance.h"
 
 struct TriangleMeshTree : public Object, public std::enable_shared_from_this<AABBTree>
 {
@@ -31,13 +30,14 @@ struct TriangleMeshTree : public Object, public std::enable_shared_from_this<AAB
   // Side effects: num_leaves is set to objects.size() and left/right pointers
   // set to subtrees or leaf Objects accordingly.
   TriangleMeshTree(
-    const std::vector<std::shared_ptr<Object> > & objects, 
-    int depth=0);
+    const std::vector<std::shared_ptr<MeshTriangle> > & triangles);
   virtual bool intersect(
-    const Ray & ray,
+    const Ray& ray,
     const double min_t,
+    double & t,
     Eigen::Vector3d & hit_p,
     Eigen::Vector3d & n,
+    std::shared_ptr<Material> & material,
     Eigen::Vector3d & kd,
     Eigen::Vector3d & ks,
     Eigen::Vector3d & km,

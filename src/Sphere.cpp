@@ -1,7 +1,16 @@
 #include "Sphere.h"
 #include "Ray.h"
 bool Sphere::intersect(
-  const Ray & ray, const double min_t, double & t, Eigen::Vector3d & n) const
+  const Ray& ray,
+  const double min_t,
+  double & t,
+  Eigen::Vector3d & hit_p,
+  Eigen::Vector3d & n,
+  std::shared_ptr<Material> & mat,
+  Eigen::Vector3d & kd,
+  Eigen::Vector3d & ks,
+  Eigen::Vector3d & km,
+  double & p) const
 {
   ////////////////////////////////////////////////////////////////////////////
   // Replace with your code here:
@@ -24,8 +33,13 @@ bool Sphere::intersect(
     t = t1;
   }
 
-  Eigen::Vector3d hit_point = ray.origin + t * ray.direction;
-  n = hit_point - center;
+  hit_p = ray.origin + t * ray.direction;
+  n = (hit_point - center).normalized()
+  mat = this->material;
+  kd = this->material->kd;
+  ks = this->material->ks;
+  km = this->material->km;
+  p = this->material->phong_exponent;
   return true;
   ////////////////////////////////////////////////////////////////////////////
 }

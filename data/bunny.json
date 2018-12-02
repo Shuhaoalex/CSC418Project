@@ -85,7 +85,7 @@
 
   "objects": [
     {
-      "type": "soup",
+      "type": "mesh",
       "material": "matte gray",
       "stl": "bunny.stl"
     },

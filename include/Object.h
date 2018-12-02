@@ -27,9 +27,10 @@ class Object
     virtual bool intersect(
       const Ray& ray,
       const double min_t,
+      double & t,
       Eigen::Vector3d & hit_p,
       Eigen::Vector3d & n,
-      std::shared_ptr<Material> & material,
+      std::shared_ptr<Material> & mat,
       Eigen::Vector3d & kd,
       Eigen::Vector3d & ks,
       Eigen::Vector3d & km,

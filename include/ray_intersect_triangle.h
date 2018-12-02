@@ -2,6 +2,7 @@
 #define RAY_INTERSECT_TRIANGLE_H
 #include "Ray.h"
 #include <Eigen/Core>
+#include <Eigen/Geometry>
 
 // Intersect a ray with a triangle
 //
@@ -21,6 +22,9 @@ bool ray_intersect_triangle(
   const Eigen::RowVector3d & B,
   const Eigen::RowVector3d & C,
   const double min_t,
-  Eigen::Vector3d & bayer);
+  double & t,
+  Eigen::Vector3d & n,
+  Eigen::Vector3d & hit_p,
+  Eigen::Vector3d & bary);
 #endif
 

@@ -15,7 +15,10 @@ class DirectionalLight : public Light
     //    d  3D direction from point toward light as a vector.
     //    max_t  parametric distance from q along d to light (may be inf)
     void direction(
-      const Eigen::Vector3d & q, Eigen::Vector3d & d, double & max_t) const;
+      const Eigen::Vector3d & q, Eigen::Vector3d & d, double & max_t) {
+        d = (-1 * this->d).normalized();
+        max_t = std::numeric_limits<double>::infinity();
+      }
 };
 #endif
 

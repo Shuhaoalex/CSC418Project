@@ -32,6 +32,7 @@ inline bool read_json(
 #include "Sphere.h"
 #include "Plane.h"
 #include "MeshTriangle.h"
+#include "TriangleMeshTree.h"
 #include "Light.h"
 #include "PointLight.h"
 #include "DirectionalLight.h"
@@ -88,7 +89,6 @@ inline bool read_json(
     {
       std::string name = jmat["name"];
       std::shared_ptr<Material> material(new Material());
-      material->ka = parse_Vector3d(jmat["ka"]);
       material->kd = parse_Vector3d(jmat["kd"]);
       material->ks = parse_Vector3d(jmat["ks"]);
       material->km = parse_Vector3d(jmat["km"]);
@@ -135,13 +135,15 @@ inline bool read_json(
         sphere->center = parse_Vector3d(jobj["center"]);
         sphere->radius = jobj["radius"].get<double>();
         objects.push_back(sphere);
+        sphere->material = materials[jobj["material"]];
       }else if(jobj["type"] == "plane")
       {
         std::shared_ptr<Plane> plane(new Plane());
         plane->point = parse_Vector3d(jobj["point"]);
         plane->normal = parse_Vector3d(jobj["normal"]).normalized();
         objects.push_back(plane);
-      }else if(jobj["type"] == "soup")
+        plane->material = materials[jobj["material"]];
+      }else if(jobj["type"] == "mesh")
       {
         std::vector<std::vector<double> > V;
         std::vector<std::vector<double> > F;
@@ -159,34 +161,15 @@ inline bool read_json(
               stl_path,
               V,F,N);
         }
-        std::vector<std::shared_ptr<Object> > triangles;
+        std::vector<std::shared_ptr<MeshTriangle> > triangles;
         triangles.reserve(F.rows());
         // Create a box for each triangle
         for(int f = 0;f<F.rows();f++)
         {
-          triangles.emplace_back( std::make_shared<MeshTriangle>(V,F,f) );
+          triangles.emplace_back( std::make_shared<MeshTriangle>(V,F,f, materials[jobj["material"]]) );
         }
-        std::shared_ptr<AABBTree> root = std::make_shared<AABBTree>(triangles);
-        // std::shared_ptr<TriangleSoup> soup(new TriangleSoup());
-        // for(int f = 0;f<F.size();f++)
-        // {
-        //   std::shared_ptr<Triangle> tri(new Triangle());
-        //   tri->corners = std::make_tuple(
-        //     Eigen::Vector3d( V[F[f][0]][0], V[F[f][0]][1], V[F[f][0]][2]),
-        //     Eigen::Vector3d( V[F[f][1]][0], V[F[f][1]][1], V[F[f][1]][2]),
-        //     Eigen::Vector3d( V[F[f][2]][0], V[F[f][2]][1], V[F[f][2]][2])
-        //   );
-        //   soup->triangles.push_back(tri);
-        // }
+        std::shared_ptr<TriangleMeshTree> root = std::make_shared<TriangleMeshTree>(triangles);
         objects.push_back(root);
-      }
-      //objects.back()->material = default_material;
-      if(jobj.count("material"))
-      {
-        if(materials.count(jobj["material"]))
-        {
-          objects.back()->material = materials[jobj["material"]];
-        }
       }
     }
   };

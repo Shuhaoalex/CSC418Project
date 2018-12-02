@@ -1,23 +1,21 @@
-#include "MeshTree.h"
+#include "TriangleMeshTree.h"
 #include "insert_box_into_box.h"
 #include <algorithm>
 
-MeshTree::MeshTree(
-  const std::vector<std::shared_ptr<Object> > & objects,
-  int a_depth): 
-  depth(std::move(a_depth)), 
-  num_leaves(objects.size())
+TriangleMeshTree::TriangleMeshTree(
+  const std::vector<std::shared_ptr<MeshTriangle> > & triangles,
+  int a_depth)
 {
   ////////////////////////////////////////////////////////////////////////////
   // Add your code here
-  this->box = BoundingBox(objects[0]->box.min_corner, objects[0]->box.max_corner);
-  for (int i = 1; i < objects.size(); i++) {
-    insert_box_into_box(objects[i]->box, this->box);
+  this->box = BoundingBox(triangles[0]->box.min_corner, triangles[0]->box.max_corner);
+  for (int i = 1; i < triangles.size(); i++) {
+    insert_box_into_box(triangles[i]->box, this->box);
   }
 
-  if (objects.size() == 2) {
-    this->left = objects[0];
-    this->right = objects[1];
+  if (triangles.size() == 2) {
+    this->left = triangles[0];
+    this->right = triangles[1];
   } else {
     int longest_axis;
     double axis_midpoint, axis_length;
@@ -57,11 +55,11 @@ MeshTree::MeshTree(
     }
     
     if (left_objects.size() >= 2){
-      this->left = std::make_shared<AABBTree>(left_objects, this->depth + 1);
+      this->left = std::make_shared<TriangleMeshTree>(left_objects);
     }
 
     if (right_objects.size() >= 2){
-      this->right = std::make_shared<AABBTree>(right_objects, this->depth + 1);
+      this->right = std::make_shared<TriangleMeshTree>(right_objects);
     }
   }
   ////////////////////////////////////////////////////////////////////////////
@@ -70,41 +68,67 @@ MeshTree::MeshTree(
 bool MeshTree::intersect(
   const Ray& ray,
   const double min_t,
-  const double max_t,
   double & t,
-  std::shared_ptr<Object> & descendant) const 
+  Eigen::Vector3d & hit_p,
+  Eigen::Vector3d & n,
+  std::shared_ptr<Material> & material,
+  Eigen::Vector3d & kd,
+  Eigen::Vector3d & ks,
+  Eigen::Vector3d & km,
+  double & p)
 {
   ////////////////////////////////////////////////////////////////////////////
   // Replace with your code here:
-  if (!ray_intersect_box(ray, this->box, min_t, max_t, t)) {
+  if (!ray_intersect_box(ray, this->box, min_t)) {
     return false;
   }
-  double right_t, left_t;
-  std::shared_ptr<Object> left_de, right_de;
-  bool hit_left = this->left->ray_intersect(ray, min_t, max_t, left_t, left_de);
-  bool hit_right = this->right->ray_intersect(ray, min_t, max_t, right_t, right_de);
-  if (hit_left && !left_de) {
-    left_de = this->left;
-  }
-  if (hit_right && !right_de) {
-    right_de = this->right;
-  }
+  double r_t, l_t, l_p, r_p;
+  std::shared_ptr<Material> l_mat, r_mat;
+  Eigen::Vector3d l_hp, r_hp, l_n, r_n, l_kd, r_kd, l_ks, r_ks, l_km, r_km;
+
+  bool hit_left = this->left->intersect(ray, min_t, l_t, l_hp, l_n, l_mat, l_kd, l_ks, l_km, l_p);
+  bool hit_right = this->right->intersect(ray, min_t, r_t, r_hp, r_n, r_mat, r_kd, r_ks, r_km, r_p);
   if (hit_left && hit_right) {
-    if(left_t <= right_t){
-      t = left_t;
-      descendant = left_de;
+    if (l_t <= r_t) {
+      t = l_t;
+      hit_p = l_hp;
+      n = l_n;
+      material = l_mat;
+      kd = l_kd;
+      ks = l_ks;
+      km = l_km;
+      p = l_p;
+      return true;
     } else {
-      t = right_t;
-      descendant = right_de;
+      t = r_t;
+      hit_p = r_hp;
+      n = r_n;
+      material = r_mat;
+      kd = r_kd;
+      ks = r_ks;
+      km = r_km;
+      p = r_p;
+      return true;
     }
-    return true;
   } else if (hit_left) {
-    t = left_t;
-    descendant = left_de;
+    t = l_t;
+    hit_p = l_hp;
+    n = l_n;
+    material = l_mat;
+    kd = l_kd;
+    ks = l_ks;
+    km = l_km;
+    p = l_p;
     return true;
-  } else if (hit_right){
-    t = right_t;
-    descendant = right_de;
+  } else if (hit_right) {
+    t = r_t;
+    hit_p = r_hp;
+    n = r_n;
+    material = r_mat;
+    kd = r_kd;
+    ks = r_ks;
+    km = r_km;
+    p = r_p;
     return true;
   }
   return false;
