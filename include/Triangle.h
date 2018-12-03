@@ -12,16 +12,18 @@ class Triangle : public Object
   public:
     const Eigen::MatrixXd & V;
     const Eigen::MatrixXi & F;
-    const Eigen::MatrixXd & N;
-    const Eigen::MatrixXi & FN;
-    int f;
+    const int f;
+    const Eigen::RowVector3d NA;
+    const Eigen::RowVector3d NB;
+    const Eigen::RowVector3d NC;
     inline Triangle(
       Eigen::MatrixXd & _V,
       Eigen::MatrixXi & _F,
-      Eigen::MatrixXd & _N,
-      Eigen::MatrixXi & _FN,
-      const int _f
-    ): V(_V), F(_F), N(_N), FN(_FN), f(_f) {
+      const int _f,
+      Eigen::RowVector3d _NA,
+      Eigen::RowVector3d _NB,
+      Eigen::RowVector3d _NC
+    ): V(_V), F(_F), f(_f), NA(_NA), NB(_NB), NC(_NC) {
       insert_triangle_into_box(V.row(F(f, 0)),
                                V.row(F(f, 1)),
                                V.row(F(f, 2)),

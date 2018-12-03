@@ -26,13 +26,16 @@ bool Triangle::intersect(
   Eigen::Vector3d HA = A - H;
   Eigen::Vector3d HB = B - H;
   Eigen::Vector3d HC = C - H;
-  Eigen::Vector3d S1 = HA.cross(HB);
-  Eigen::Vector3d S2 = HA.cross(HC);
-  Eigen::Vector3d S3 = HB.cross(HC);
+  double SC = (HA.cross(HB)).norm();
+  double SB = (HA.cross(HC)).norm();
+  double SA = (HB.cross(HC)).norm();
   // add epilon to the treshold to consider the numerical problem
-  if (S1.norm() + S2.norm() + S3.norm() > hit_info.n.norm() * (1 + 2 * std::numeric_limits<double>::epsilon())) {
+  if (SA + SB + SC > hit_info.n.norm() * (1 + 2 * std::numeric_limits<double>::epsilon())) {
     return false;
   }
+  Eigen::Vector3d bary(SA,SB,SC);
+  bary /= bary.sum();
+  hit_info.n = bary[0] * NA + bary[1] * NB + bary[2] * NC;
   hit_info.ka = this->material->ka;
   hit_info.kd = this->material->kd;
   hit_info.ks = this->material->ks;

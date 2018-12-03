@@ -38,14 +38,15 @@ inline bool read_json(
 #include "PointLight.h"
 #include "DirectionalLight.h"
 #include "Material.h"
+#include "per_corner_normals.h"
 #include <Eigen/Geometry>
 #include <fstream>
 #include <iostream>
 #include <cassert>
 #include <Eigen/StdVector>
 
-std::vector<Eigen::MatrixXd, Eigen::aligned_allocator<Eigen::MatrixXd>> V_l,TC_l,N_l;
-std::vector<Eigen::MatrixXi, Eigen::aligned_allocator<Eigen::MatrixXi>> F_l,FTC_l,FN_l;
+std::vector<Eigen::MatrixXd, Eigen::aligned_allocator<Eigen::MatrixXd>> V_l;
+std::vector<Eigen::MatrixXi, Eigen::aligned_allocator<Eigen::MatrixXi>> F_l;
 inline bool read_json(
   const std::string & filename, 
   Camera & camera,
@@ -166,17 +167,14 @@ inline bool read_json(
               V,TC,N,F,FTC,FN);
         }
         V_l.push_back(V);
-        TC_l.push_back(TC);
-        N_l.push_back(N);
         F_l.push_back(F);
-        FTC_l.push_back(FTC);
-        FN_l.push_back(FN);
+        per_corner_normals(V, F, 20, N);
 
         std::vector<std::shared_ptr<Object>> triangles;
         triangles.reserve(F.rows());
         for(int f = 0;f<F.rows();f++)
         {
-          triangles.emplace_back(std::make_shared<Triangle>(V_l.back(),F_l.back(),N_l.back(),FN_l.back(),f));
+          triangles.emplace_back(std::make_shared<Triangle>(V_l.back(),F_l.back(),f,N.row(f*3),N.row(f*3 + 1),N.row(f*3 + 2)));
           triangles[f]->material = materials[jobj["material"]];
         }
         std::shared_ptr<AABBTree> soup(new AABBTree(triangles));
