@@ -6,8 +6,8 @@
 // Blinn-Phong Approximate Shading Material Parameters
 struct Material
 {
-  // Diffuse, Specular, Mirror Color
-  Eigen::Vector3d kd,ks,km;
+  // Ambient, Diffuse, Specular, Mirror Color
+  Eigen::Vector3d ka,kd,ks,km;
   // Phong exponent
   double phong_exponent;
   bool use_UV;

@@ -91,6 +91,7 @@ inline bool read_json(
     {
       std::string name = jmat["name"];
       std::shared_ptr<Material> material(new Material());
+      material->ka = parse_Vector3d(jmat["ka"]);
       material->kd = parse_Vector3d(jmat["kd"]);
       material->ks = parse_Vector3d(jmat["ks"]);
       material->km = parse_Vector3d(jmat["km"]);
@@ -109,13 +110,13 @@ inline bool read_json(
     {
       if(jlight["type"] == "directional")
       {
-        std::shared_ptr<DirectionalLight> light;
+        std::shared_ptr<DirectionalLight> light(new DirectionalLight());
         light->d = parse_Vector3d(jlight["direction"]).normalized();
         light->I = parse_Vector3d(jlight["color"]);
         lights.push_back(light);
       }else if(jlight["type"] == "point")
       {
-        std::shared_ptr<PointLight> light;
+        std::shared_ptr<PointLight> light(new PointLight());
         light->p = parse_Vector3d(jlight["position"]);
         light->I = parse_Vector3d(jlight["color"]);
         lights.push_back(light);
@@ -138,7 +139,6 @@ inline bool read_json(
         sphere->radius = jobj["radius"].get<double>();
         sphere->material = materials[jobj["material"]];
         objects.push_back(sphere);
-        sphere->material = materials[jobj["material"]];
       }else if(jobj["type"] == "plane")
       {
         std::shared_ptr<Plane> plane(new Plane());
@@ -146,8 +146,7 @@ inline bool read_json(
         plane->normal = parse_Vector3d(jobj["normal"]).normalized();
         plane->material = materials[jobj["material"]];
         objects.push_back(plane);
-        plane->material = materials[jobj["material"]];
-      }else if(jobj["type"] == "mesh")
+      }else if(jobj["type"] == "triangle")
       {
         std::shared_ptr<Triangle> tri(new Triangle());
         tri->corners = std::make_tuple(
@@ -172,7 +171,7 @@ inline bool read_json(
               igl::dirname(filename)+
               PATH_SEPARATOR +
               stl_path,
-              t_V,t_F,t_N);
+              V,F,N);
         }
         std::vector<std::shared_ptr<Object>> triangles;
         for(int f = 0;f<F.size();f++)

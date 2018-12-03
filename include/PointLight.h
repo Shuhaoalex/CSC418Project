@@ -14,15 +14,7 @@ class PointLight : public Light
     //    d  3D direction from point toward light as a vector.
     //    max_t  parametric distance from q along d to light (may be inf)
     void direction(
-      const Eigen::Vector3d & q, Eigen::Vector3d & d, double & max_t){
-        d = p - q;
-        if (d.norm() > 0) {                                                                                      
-          max_t = d.norm();
-          d.normalize();
-        } else {
-          max_t = 0;
-        }
-      };
+      const Eigen::Vector3d & q, Eigen::Vector3d & d, double & max_t) const;
 };
 #endif
 

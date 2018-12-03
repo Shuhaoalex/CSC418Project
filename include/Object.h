@@ -13,8 +13,8 @@ class Object
   public:
     BoundingBox box;
     std::shared_ptr<Material> material;
-    BoundingBox box;
     // https://stackoverflow.com/questions/461203/when-to-use-virtual-destructors
+    virtual ~Object() {}
     // Intersect object with ray.
     //
     // Inputs:

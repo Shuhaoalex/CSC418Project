@@ -7,6 +7,7 @@ class Light
     // Color (intensities)
     Eigen::Vector3d I;
     // https://stackoverflow.com/questions/461203/when-to-use-virtual-destructors
+    virtual ~Light() {};
     // Given a query point return the direction _toward_ the Light.
     //
     // Input:
