@@ -83,20 +83,24 @@ int main(int argc, char * argv[])
       while (available_threads == 0){;}
     }
   
-    pthread_mutex_lock(&running_mutex);
     while (buffer_n != 0) {
       pthread_join(threads[buffer[buffer_head]], NULL);
       buffer_head = (buffer_head + 1)%NUM_THREAD;
+      pthread_mutex_lock(&running_mutex);
       buffer_n--;
+      pthread_mutex_unlock(&running_mutex);
     }
-    pthread_mutex_unlock(&running_mutex);
   }
 
-  while (buffer_n !=0) {
-    std::cout << buffer_n <<" " << buffer[buffer_head]<<"\n";
-    pthread_join(threads[buffer[buffer_head]], NULL);
-    buffer_head = (buffer_head + 1)%NUM_THREAD;
-    buffer_n--;
+  while (available_threads != NUM_THREAD) {
+    while (buffer_n == 0){;}
+    while (buffer_n != 0) {
+      pthread_join(threads[buffer[buffer_head]], NULL);
+      buffer_head = (buffer_head + 1)%NUM_THREAD;
+      pthread_mutex_lock(&running_mutex);
+      buffer_n--;
+      pthread_mutex_unlock(&running_mutex);
+    }
   }
   write_ppm("rgb.ppm",rgb_image,width,height,3);
 }
