@@ -4,27 +4,22 @@ bool first_hit(
   const Ray & ray, 
   const double min_t,
   const std::vector< std::shared_ptr<Object> > & objects,
-  int & hit_id, 
-  double & t,
-  Eigen::Vector3d & n)
+  HitInfo & hit_info)
 {
   ////////////////////////////////////////////////////////////////////////////
   // Replace with your code here:
   bool result = false;
-  double temp_t;
-  t = -1;
-  Eigen::Vector3d temp_n;
+  HitInfo temp_info;
+  hit_info.t = -1;
   for (int i = 0; i < objects.size(); i++) {
-    if(objects[i]->intersect(ray, min_t, temp_t, temp_n)){
-      if (t == -1 || t > temp_t) {
-        t = temp_t;
-        n = temp_n;
-        hit_id = i;
+    if(objects[i]->intersect(ray, min_t, temp_info)){
+      if (hit_info.t == -1 || hit_info.t > temp_info.t) {
+        hit_info = temp_info;
+        hit_info.n.normalize();
         result = true;
       }
     }
   }
-  n.normalize();
   return result;
   ////////////////////////////////////////////////////////////////////////////
 }

@@ -6,18 +6,16 @@
 
 Eigen::Vector3d blinn_phong_shading(
   const Ray & ray,
-  const int & hit_id, 
-  const double & t,
-  const Eigen::Vector3d & n,
+  const HitInfo & hit_info,
   const std::vector< std::shared_ptr<Object> > & objects,
   const std::vector<std::shared_ptr<Light> > & lights)
 {
   ////////////////////////////////////////////////////////////////////////////
   // Replace with your code here:
-  std::shared_ptr<Material> obj_material = objects[hit_id]->material;
-  Eigen::Vector3d hit_point = ray.origin + t * ray.direction;
+  // std::shared_ptr<Material> obj_material = objects[hit_id]->material;
+  Eigen::Vector3d hit_point = hit_info.hit_p;
   Eigen::Vector3d result(0.0,0.0,0.0);
-  Eigen::Vector3d hit_norm = n.normalized();
+  Eigen::Vector3d hit_norm = hit_info.n;
 
   for (int i = 0; i < lights.size(); i++) {
     Eigen::Vector3d direction_to_light;
@@ -28,20 +26,19 @@ Eigen::Vector3d blinn_phong_shading(
     Ray light_ray;
     light_ray.origin = hit_point;
     light_ray.direction = direction_to_light;
-    int hit;
-    double t_temp;
-    Eigen::Vector3d n_temp;
-    if (!first_hit(light_ray, std::numeric_limits<double>::epsilon()*1000, objects, hit, t_temp, n_temp) || t_temp > max_t) {
+    HitInfo temp_info;
+    
+    if (!first_hit(light_ray, std::numeric_limits<double>::epsilon()*1000, objects, temp_info) || temp_info.t > max_t) {
       double multiplier;
 
       // This part is to compute the Lambertien shading
       multiplier = hit_norm.dot(direction_to_light);
-      result += ((obj_material->kd).array() * (lights[i]->I).array()).matrix() * ((0<multiplier)?multiplier:0);
+      result += ((hit_info.kd).array() * (lights[i]->I).array()).matrix() * ((0<multiplier)?multiplier:0);
 
       // This part is to compute the specular color
       Eigen::Vector3d h = (direction_to_light - ray.direction.normalized()).normalized();
       multiplier = hit_norm.dot(h);
-      result += ((obj_material->ks).array() * (lights[i]->I).array()).matrix() * pow(((0<multiplier)?multiplier:0), obj_material->phong_exponent);
+      result += ((hit_info.ks).array() * (lights[i]->I).array()).matrix() * pow(((0<multiplier)?multiplier:0), hit_info.phong_exponent);
     }
   }
   return result;

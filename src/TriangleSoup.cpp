@@ -4,19 +4,17 @@
 #include "first_hit.h"
 
 bool TriangleSoup::intersect(
-  const Ray & ray, const double min_t, double & t, Eigen::Vector3d & n) const
+  const Ray & ray, const double min_t, HitInfo & hit_info) const
 {
   ////////////////////////////////////////////////////////////////////////////
   // Replace with your code here:
   bool result = false;
-  double temp_t;
-  t = -1;
-  Eigen::Vector3d temp_n;
+  HitInfo temp_info;
+  hit_info.t = -1;
   for (int i = 0; i < triangles.size(); i++) {
-    if(triangles[i]->intersect(ray, min_t, temp_t, temp_n)){
-      if (t == -1 || t > temp_t) {
-        t = temp_t;
-        n = temp_n;
+    if(triangles[i]->intersect(ray, min_t, temp_info)){
+      if (hit_info.t == -1 || hit_info.t > temp_info.t) {
+        hit_info = temp_info;
         result = true;
       }
     }

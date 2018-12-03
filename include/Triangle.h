@@ -19,7 +19,7 @@ class Triangle : public Object
     //   n  surface normal at point of intersection
     // Returns iff there a first intersection is found.
     bool intersect(
-      const Ray & ray, const double min_t, double & t, Eigen::Vector3d & n) const;
+      const Ray & ray, const double min_t, HitInfo & hit_info) const;
 };
 
 #endif

@@ -6,6 +6,7 @@
 #include <Eigen/Core>
 #include <vector>
 #include <memory>
+#include "Material.h"
 
 // Find the first (visible) hit given a ray and a collection of scene objects
 //
@@ -24,8 +25,6 @@ bool first_hit(
   const Ray & ray, 
   const double min_t,
   const std::vector< std::shared_ptr<Object> > & objects,
-  int & hit_id, 
-  double & t,
-  Eigen::Vector3d & n);
+  HitInfo & hit_info);
 
 #endif

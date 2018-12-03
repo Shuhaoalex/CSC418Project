@@ -17,6 +17,7 @@ void viewing_ray(
   Eigen::Vector3d direction((j - mid_pix_x)*pix_width, (mid_pix_y - i)*pix_height, -camera.d);
   ray.origin = camera.e;
   ray.direction = direction[0] * camera.u + direction[1] * camera.v + direction[2] * camera.w;
+  ray.I = 1;
   ////////////////////////////////////////////////////////////////////////////
 }
 

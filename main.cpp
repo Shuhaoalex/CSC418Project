@@ -12,7 +12,6 @@
 #include <limits>
 #include <functional>
 
-
 int main(int argc, char * argv[])
 {
   Camera camera;
@@ -20,7 +19,7 @@ int main(int argc, char * argv[])
   std::vector< std::shared_ptr<Light> > lights;
   // Read a camera and scene description from given .json file
   read_json(
-    argc<=1?"../shared/data/sphere-and-plane.json":argv[1],
+    argc<=1?"../data/sphere-and-plane.json":argv[1],
     camera,
     objects,
     lights);
@@ -48,7 +47,6 @@ int main(int argc, char * argv[])
       rgb_image[0+3*(j+width*i)] = 255.0*clamp(rgb(0));
       rgb_image[1+3*(j+width*i)] = 255.0*clamp(rgb(1));
       rgb_image[2+3*(j+width*i)] = 255.0*clamp(rgb(2));
-
     }
   }
 

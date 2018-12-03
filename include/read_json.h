@@ -5,6 +5,7 @@
 #include <string>
 #include <memory>
 #include <unordered_map>
+#include <iostream>
 // Forward declaration
 struct Object;
 struct Light;
@@ -32,11 +33,12 @@ inline bool read_json(
 #include "Sphere.h"
 #include "Plane.h"
 #include "Triangle.h"
-#include "TriangleSoup.h"
+#include "AABBTree.h"
 #include "Light.h"
 #include "PointLight.h"
 #include "DirectionalLight.h"
 #include "Material.h"
+#include "insert_triangle_into_box.h"
 #include <Eigen/Geometry>
 #include <fstream>
 #include <iostream>
@@ -135,12 +137,14 @@ inline bool read_json(
         std::shared_ptr<Sphere> sphere(new Sphere());
         sphere->center = parse_Vector3d(jobj["center"]);
         sphere->radius = jobj["radius"].get<double>();
+        sphere->material = materials[jobj["material"]];
         objects.push_back(sphere);
       }else if(jobj["type"] == "plane")
       {
         std::shared_ptr<Plane> plane(new Plane());
         plane->point = parse_Vector3d(jobj["point"]);
         plane->normal = parse_Vector3d(jobj["normal"]).normalized();
+        plane->material = materials[jobj["material"]];
         objects.push_back(plane);
       }else if(jobj["type"] == "triangle")
       {
@@ -149,6 +153,7 @@ inline bool read_json(
           parse_Vector3d(jobj["corners"][0]),
           parse_Vector3d(jobj["corners"][1]),
           parse_Vector3d(jobj["corners"][2]));
+        tri->material = materials[jobj["material"]];
         objects.push_back(tri);
       }else if(jobj["type"] == "soup")
       {
@@ -168,7 +173,7 @@ inline bool read_json(
               stl_path,
               V,F,N);
         }
-        std::shared_ptr<TriangleSoup> soup(new TriangleSoup());
+        std::vector<std::shared_ptr<Object>> triangles;
         for(int f = 0;f<F.size();f++)
         {
           std::shared_ptr<Triangle> tri(new Triangle());
@@ -177,22 +182,16 @@ inline bool read_json(
             Eigen::Vector3d( V[F[f][1]][0], V[F[f][1]][1], V[F[f][1]][2]),
             Eigen::Vector3d( V[F[f][2]][0], V[F[f][2]][1], V[F[f][2]][2])
           );
-          soup->triangles.push_back(tri);
+          insert_triangle_into_box(std::get<0>(tri->corners), std::get<1>(tri->corners), std::get<2>(tri->corners), tri->box);
+          tri->material = materials[jobj["material"]];
+          triangles.push_back(tri);
         }
+        std::shared_ptr<AABBTree> soup(new AABBTree(triangles));
         objects.push_back(soup);
-      }
-      //objects.back()->material = default_material;
-      if(jobj.count("material"))
-      {
-        if(materials.count(jobj["material"]))
-        {
-          objects.back()->material = materials[jobj["material"]];
-        }
       }
     }
   };
   parse_objects(j["objects"],objects);
-
   return true;
 }
 
