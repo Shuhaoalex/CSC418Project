@@ -42,13 +42,6 @@ bool check_shade(
   const Eigen::Vector3d & direction,
   double min_t,
   double max_t  
-) {
-  Ray light_ray(hit_point, direction);
-  double t, temp_p;
-  Eigen::Vector3d temp_p, temp_n, temp_kd, temp_ks, temp_km;
-  std::shared_ptr<Material> material;
-  bool temp = first_hit(light_ray, min_t, objects, t, temp_p, temp_n, material, temp_kd, temp_ks, temp_km, temp_p);
-  return temp && t <= max_t;
-}
+);
 
 #endif

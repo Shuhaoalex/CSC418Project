@@ -6,6 +6,7 @@
 
 struct Ray 
 {
+  Ray(){};
   Ray(Eigen::Vector3d a_origin, Eigen::Vector3d a_direction) :
     origin(std::move(a_origin)), direction(std::move(a_direction))
   { }

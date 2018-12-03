@@ -3,8 +3,7 @@
 #include <algorithm>
 
 TriangleMeshTree::TriangleMeshTree(
-  const std::vector<std::shared_ptr<MeshTriangle> > & triangles,
-  int a_depth)
+  const std::vector<std::shared_ptr<Object> > & triangles)
 {
   ////////////////////////////////////////////////////////////////////////////
   // Add your code here
@@ -30,11 +29,11 @@ TriangleMeshTree::TriangleMeshTree(
     }
 
     std::vector<std::shared_ptr<Object>> left_objects, right_objects;
-    for (int i = 0; i < objects.size(); i++) {
-      if (objects[i]->box.center()[longest_axis] <= axis_midpoint) {
-        left_objects.push_back(objects[i]);
+    for (int i = 0; i < triangles.size(); i++) {
+      if (triangles[i]->box.center()[longest_axis] <= axis_midpoint) {
+        left_objects.push_back(triangles[i]);
       } else {
-        right_objects.push_back(objects[i]);
+        right_objects.push_back(triangles[i]);
       }
     }
 
@@ -65,7 +64,7 @@ TriangleMeshTree::TriangleMeshTree(
   ////////////////////////////////////////////////////////////////////////////
 }
 
-bool MeshTree::intersect(
+bool TriangleMeshTree::intersect(
   const Ray& ray,
   const double min_t,
   double & t,
@@ -75,7 +74,7 @@ bool MeshTree::intersect(
   Eigen::Vector3d & kd,
   Eigen::Vector3d & ks,
   Eigen::Vector3d & km,
-  double & p)
+  double & p) const
 {
   ////////////////////////////////////////////////////////////////////////////
   // Replace with your code here:

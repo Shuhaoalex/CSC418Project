@@ -34,7 +34,7 @@ bool Sphere::intersect(
   }
 
   hit_p = ray.origin + t * ray.direction;
-  n = (hit_point - center).normalized()
+  n = (hit_p - center).normalized();
   mat = this->material;
   kd = this->material->kd;
   ks = this->material->ks;

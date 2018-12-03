@@ -16,5 +16,9 @@ struct BoundingBox
       min_corner(std::move(a_min_corner)),
       max_corner(std::move(a_max_corner))
   { }
+  Eigen::RowVector3d center()
+  {
+      return 0.5*(max_corner + min_corner);
+  }
 };
 #endif

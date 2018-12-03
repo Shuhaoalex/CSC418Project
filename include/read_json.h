@@ -107,13 +107,13 @@ inline bool read_json(
     {
       if(jlight["type"] == "directional")
       {
-        std::shared_ptr<DirectionalLight> light(new DirectionalLight());
+        std::shared_ptr<DirectionalLight> light;
         light->d = parse_Vector3d(jlight["direction"]).normalized();
         light->I = parse_Vector3d(jlight["color"]);
         lights.push_back(light);
       }else if(jlight["type"] == "point")
       {
-        std::shared_ptr<PointLight> light(new PointLight());
+        std::shared_ptr<PointLight> light;
         light->p = parse_Vector3d(jlight["position"]);
         light->I = parse_Vector3d(jlight["color"]);
         lights.push_back(light);
@@ -145,9 +145,9 @@ inline bool read_json(
         plane->material = materials[jobj["material"]];
       }else if(jobj["type"] == "mesh")
       {
-        std::vector<std::vector<double> > V;
-        std::vector<std::vector<double> > F;
-        std::vector<std::vector<int> > N;
+        std::vector<std::vector<double> > t_V;
+        std::vector<std::vector<double> > t_F;
+        std::vector<std::vector<int> > t_N;
         {
 #if defined(WIN32) || defined(_WIN32)
 #define PATH_SEPARATOR std::string("\\")
@@ -159,9 +159,18 @@ inline bool read_json(
               igl::dirname(filename)+
               PATH_SEPARATOR +
               stl_path,
-              V,F,N);
+              t_V,t_F,t_N);
         }
-        std::vector<std::shared_ptr<MeshTriangle> > triangles;
+        Eigen::MatrixXd V(t_V.size(), 3);
+        Eigen::MatrixXi F(t_F.size(), 3);
+        for (int f = 0; f < t_F.size(); f++) {
+          F.row(f) << t_F[f][0], t_F[f][1], t_F[f][2];
+        }
+        for (int v = 0; v < t_V.size(); v++) {
+          V.row(v) << t_V[v][0], t_V[v][1], t_V[v][2];
+        }
+
+        std::vector<std::shared_ptr<Object> > triangles;
         triangles.reserve(F.rows());
         // Create a box for each triangle
         for(int f = 0;f<F.rows();f++)

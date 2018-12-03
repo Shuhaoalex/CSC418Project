@@ -6,8 +6,11 @@
 #include <memory>
 #include "BoundingBox.h"
 #include "Material.h"
+#include "ray_intersect_triangle.h"
+#include "insert_triangle_into_box.h"
+#include <algorithm>
 
-struct MeshTriangle : public Object
+class MeshTriangle : public Object
 {
   public:
     BoundingBox box;
@@ -25,22 +28,50 @@ struct MeshTriangle : public Object
     //   F  pointer to mesh face list
     //   f  index of triangle in _F
     // Side effects: inserts this triangle into .box (see Object.h)
-    inline MeshTriangle(
-      const Eigen::MatrixXd & V,
-      const Eigen::MatrixXi & F,
-      const int f,
-      const std::shared_ptr<Material> mat);
+    MeshTriangle(
+      const Eigen::MatrixXd & _V,
+      const Eigen::MatrixXi & _F,
+      const int _f,
+      const std::shared_ptr<Material> mat): V(_V), F(_F), f(_f){
+        insert_triangle_into_box(
+          V.row(F(f,0)),
+          V.row(F(f,1)),
+          V.row(F(f,2)),
+          box);
+        this->material = mat;
+      }
     // Object implementations (see Object.h)
-    inline bool intersect(
+    bool intersect(
       const Ray& ray,
       const double min_t,
       double & t,
       Eigen::Vector3d & hit_p,
       Eigen::Vector3d & n,
-      std::shared_ptr<Material> & material,
+      std::shared_ptr<Material> & mat,
       Eigen::Vector3d & kd,
       Eigen::Vector3d & ks,
       Eigen::Vector3d & km,
-      double & p) const;
+      double & p) const {
+        Eigen::Vector3d bary;
+        if (ray_intersect_triangle(
+          ray,
+          V.row(F(f,0)),
+          V.row(F(f,1)),
+          V.row(F(f,2)),
+          min_t,
+          t,
+          n,
+          hit_p,
+          bary
+        )) {
+          mat = this->material;
+          kd = this->material->kd;
+          ks = this->material->ks;
+          km = this->material->km;
+          p = this->material->phong_exponent;
+          return true;
+        }
+        return false;
+      };
 };
 #endif

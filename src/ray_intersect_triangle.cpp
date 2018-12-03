@@ -36,6 +36,6 @@ bool ray_intersect_triangle(
         return false;
     }
     bary << SA, SB, SC;
-    bary = bary/bary.sum()
+    bary = bary/bary.sum();
     return true;
   }

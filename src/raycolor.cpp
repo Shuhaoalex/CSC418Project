@@ -22,7 +22,7 @@ bool raycolor(
 
     Eigen::Vector3d reflected_light_color;
     Ray reflected_light;
-    reflected_light.direction = reflect(ray.direction, hit_n);
+    reflected_light.direction = reflect(ray.direction, n);
     reflected_light.origin = hit_p;
     if (std::pow(km(0), num_recursive_calls) > std::numeric_limits<double>::epsilon() * 100) {
       if (raycolor(reflected_light, 0.0001, objects, lights, num_recursive_calls + 1, reflected_light_color)){

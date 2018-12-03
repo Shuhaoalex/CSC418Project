@@ -20,7 +20,7 @@ class Plane : public Object
   //   t  first intersection at ray.origin + t * ray.direction
   //   n  surface normal at point of intersection
   // Returns iff there a first intersection is found.
-  inline bool intersect(
+  bool intersect(
       const Ray& ray,
       const double min_t,
       double & t,
