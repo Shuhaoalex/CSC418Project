@@ -25,11 +25,9 @@ bool write_ppm(
     output << "P5 ";
   }
   output << width << " " << height << " 255\n";
-  unsigned char * buffer = new unsigned char[width*height*num_channels];
   for (int i = 0; i < width*height*num_channels; i++){
-    buffer[i] = data[i];
+    output << data[i];
   }
-  output.write((char *)buffer, width*height*num_channels);
 
   if (output.fail()) {
     return false;

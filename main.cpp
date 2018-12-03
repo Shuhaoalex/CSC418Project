@@ -13,9 +13,13 @@
 #include <functional>
 #include <pthread.h>
 #include "pthread_args.h"
+#define NUM_THREAD 40
 
-int num_threads = 40;
-volatile int available_threads = num_threads;
+volatile int available_threads = NUM_THREAD;
+int buffer[NUM_THREAD];
+volatile int buffer_head = 0;
+volatile int buffer_tail = 0;
+volatile int buffer_n = 0;
 pthread_mutex_t running_mutex = PTHREAD_MUTEX_INITIALIZER;
 
 void * tracer(void * arg) {
@@ -43,7 +47,10 @@ void * tracer(void * arg) {
   }
   pthread_mutex_lock(&running_mutex);
   available_threads++;
-  std::cout<<"line " << i << " finished " << available_threads << "\n";
+  buffer[buffer_tail] = i;
+  buffer_tail = (buffer_tail + 1)%NUM_THREAD;
+  buffer_n++;
+  // std::cout<<"line " << i << " finished " << buffer_head << " " << buffer_tail << " " << buffer_n << "\n";
   pthread_mutex_unlock(&running_mutex);
 }
 
@@ -63,24 +70,35 @@ int main(int argc, char * argv[])
   int width = 1920;
 
   std::vector<unsigned char> rgb_image(3*width*height);
-  shared_arg shared(height, width, camera, objects, lights, rgb_image, num_threads);
+  shared_arg shared(height, width, camera, objects, lights, rgb_image, NUM_THREAD);
   pthread_t threads[height];
-
   // For each row
   for (int i = 0; i < height; i++) {
     thread_arg* arg = new thread_arg(shared, i);
     pthread_mutex_lock(&running_mutex);
     available_threads--;
-    std::cout<<"line " << i << " started " << available_threads<<"\n";
     pthread_mutex_unlock(&running_mutex);
     
     pthread_create(&threads[i], NULL, tracer, arg);
-    while (available_threads == 0){;}
+
+    if (i != height - 1) {
+      while (available_threads == 0){;}
+    }
+  
+    pthread_mutex_lock(&running_mutex);
+    while (buffer_n != 0) {
+      pthread_join(threads[buffer[buffer_head]], NULL);
+      buffer_head = (buffer_head + 1)%NUM_THREAD;
+      buffer_n--;
+    }
+    pthread_mutex_unlock(&running_mutex);
   }
 
-  for(int i = 0; i < height; ++i) {
-    pthread_join(threads[i], NULL);
+  while (buffer_n !=0) {
+    std::cout << buffer_n <<" " << buffer[buffer_head]<<"\n";
+    pthread_join(threads[buffer[buffer_head]], NULL);
+    buffer_head = (buffer_head + 1)%NUM_THREAD;
+    buffer_n--;
   }
-
   write_ppm("rgb.ppm",rgb_image,width,height,3);
 }
