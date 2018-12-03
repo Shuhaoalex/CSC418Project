@@ -2,14 +2,15 @@
 #include "Ray.h"
 #include <Eigen/Geometry>
 
+
 bool Triangle::intersect(
   const Ray & ray, const double min_t, HitInfo & hit_info) const
 {
   ////////////////////////////////////////////////////////////////////////////
   // Replace with your code here:
-  Eigen::Vector3d A = std::get<0>(corners);
-  Eigen::Vector3d B = std::get<1>(corners);
-  Eigen::Vector3d C = std::get<2>(corners);
+  Eigen::Vector3d A = V.row(F(f, 0)).transpose();
+  Eigen::Vector3d B = V.row(F(f, 1)).transpose();
+  Eigen::Vector3d C = V.row(F(f, 2)).transpose();
   Eigen::Vector3d AB = B - A;
   Eigen::Vector3d AC = C - A;
   hit_info.n = AB.cross(AC);

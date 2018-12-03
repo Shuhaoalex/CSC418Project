@@ -9,5 +9,7 @@ struct HitInfo
   Eigen::Vector3d ka,kd,ks,km,n,hit_p;
   // Phong exponent
   double phong_exponent,t;
+  bool will_refract;
+  double refraction_rate;
 };
 #endif

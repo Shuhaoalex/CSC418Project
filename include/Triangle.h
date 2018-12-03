@@ -2,13 +2,31 @@
 #define TRIANGLE_H
 
 #include "Object.h"
+#include "insert_triangle_into_box.h"
 #include <Eigen/Core>
+
+#include<iostream>
 
 class Triangle : public Object
 {
   public:
-    // A triangle has three corners
-    std::tuple< Eigen::Vector3d, Eigen::Vector3d, Eigen::Vector3d> corners;
+    const Eigen::MatrixXd & V;
+    const Eigen::MatrixXi & F;
+    const Eigen::MatrixXd & N;
+    const Eigen::MatrixXi & FN;
+    int f;
+    inline Triangle(
+      Eigen::MatrixXd & _V,
+      Eigen::MatrixXi & _F,
+      Eigen::MatrixXd & _N,
+      Eigen::MatrixXi & _FN,
+      const int _f
+    ): V(_V), F(_F), N(_N), FN(_FN), f(_f) {
+      insert_triangle_into_box(V.row(F(f, 0)),
+                               V.row(F(f, 1)),
+                               V.row(F(f, 2)),
+                               this->box);
+    }
     // Intersect a triangle with ray.
     //
     // Inputs:

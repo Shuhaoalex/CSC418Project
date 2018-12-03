@@ -50,7 +50,6 @@ void * tracer(void * arg) {
   buffer[buffer_tail] = i;
   buffer_tail = (buffer_tail + 1)%NUM_THREAD;
   buffer_n++;
-  // std::cout<<"line " << i << " finished " << buffer_head << " " << buffer_tail << " " << buffer_n << "\n";
   pthread_mutex_unlock(&running_mutex);
 }
 
@@ -65,7 +64,6 @@ int main(int argc, char * argv[])
     camera,
     objects,
     lights);
-  
   int height = 1080;
   int width = 1920;
 

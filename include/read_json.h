@@ -27,7 +27,7 @@ inline bool read_json(
 // Implementation
 
 #include <json.hpp>
-#include "readSTL.h"
+#include "readOBJ.h"
 #include "dirname.h"
 #include "Object.h"
 #include "Sphere.h"
@@ -38,12 +38,14 @@ inline bool read_json(
 #include "PointLight.h"
 #include "DirectionalLight.h"
 #include "Material.h"
-#include "insert_triangle_into_box.h"
 #include <Eigen/Geometry>
 #include <fstream>
 #include <iostream>
 #include <cassert>
+#include <Eigen/StdVector>
 
+std::vector<Eigen::MatrixXd, Eigen::aligned_allocator<Eigen::MatrixXd>> V_l,TC_l,N_l;
+std::vector<Eigen::MatrixXi, Eigen::aligned_allocator<Eigen::MatrixXi>> F_l,FTC_l,FN_l;
 inline bool read_json(
   const std::string & filename, 
   Camera & camera,
@@ -146,45 +148,36 @@ inline bool read_json(
         plane->normal = parse_Vector3d(jobj["normal"]).normalized();
         plane->material = materials[jobj["material"]];
         objects.push_back(plane);
-      }else if(jobj["type"] == "triangle")
-      {
-        std::shared_ptr<Triangle> tri(new Triangle());
-        tri->corners = std::make_tuple(
-          parse_Vector3d(jobj["corners"][0]),
-          parse_Vector3d(jobj["corners"][1]),
-          parse_Vector3d(jobj["corners"][2]));
-        tri->material = materials[jobj["material"]];
-        objects.push_back(tri);
       }else if(jobj["type"] == "soup")
       {
-        std::vector<std::vector<double> > V;
-        std::vector<std::vector<double> > F;
-        std::vector<std::vector<int> > N;
+        Eigen::MatrixXd V,TC,N;
+        Eigen::MatrixXi F,FTC,FN;
         {
 #if defined(WIN32) || defined(_WIN32)
 #define PATH_SEPARATOR std::string("\\")
 #else
 #define PATH_SEPARATOR std::string("/")
 #endif
-          const std::string stl_path = jobj["stl"];
-          igl::readSTL(
+          const std::string obj_path = jobj["obj"];
+          igl::readOBJ(
               igl::dirname(filename)+
               PATH_SEPARATOR +
-              stl_path,
-              V,F,N);
+              obj_path,
+              V,TC,N,F,FTC,FN);
         }
+        V_l.push_back(V);
+        TC_l.push_back(TC);
+        N_l.push_back(N);
+        F_l.push_back(F);
+        FTC_l.push_back(FTC);
+        FN_l.push_back(FN);
+
         std::vector<std::shared_ptr<Object>> triangles;
-        for(int f = 0;f<F.size();f++)
+        triangles.reserve(F.rows());
+        for(int f = 0;f<F.rows();f++)
         {
-          std::shared_ptr<Triangle> tri(new Triangle());
-          tri->corners = std::make_tuple(
-            Eigen::Vector3d( V[F[f][0]][0], V[F[f][0]][1], V[F[f][0]][2]),
-            Eigen::Vector3d( V[F[f][1]][0], V[F[f][1]][1], V[F[f][1]][2]),
-            Eigen::Vector3d( V[F[f][2]][0], V[F[f][2]][1], V[F[f][2]][2])
-          );
-          insert_triangle_into_box(std::get<0>(tri->corners), std::get<1>(tri->corners), std::get<2>(tri->corners), tri->box);
-          tri->material = materials[jobj["material"]];
-          triangles.push_back(tri);
+          triangles.emplace_back(std::make_shared<Triangle>(V_l.back(),F_l.back(),N_l.back(),FN_l.back(),f));
+          triangles[f]->material = materials[jobj["material"]];
         }
         std::shared_ptr<AABBTree> soup(new AABBTree(triangles));
         objects.push_back(soup);
@@ -194,5 +187,4 @@ inline bool read_json(
   parse_objects(j["objects"],objects);
   return true;
 }
-
 #endif 
