@@ -15,6 +15,7 @@ struct Ray
   // non-unit length so that origin+t*direction lands on a special point when
   // t=1.)
   Eigen::Vector3d direction;
+  double I;
 };
 
 #endif

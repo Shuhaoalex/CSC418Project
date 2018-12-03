@@ -1,17 +1,15 @@
-#ifndef SPHERE_H
-#define SPHERE_H
+#ifndef TRIANGLE_H
+#define TRIANGLE_H
 
-#include "Sphere.h"
 #include "Object.h"
 #include <Eigen/Core>
 
-class Sphere : public Object
+class Triangle : public Object
 {
   public:
-    Eigen::Vector3d center;
-    double radius;
-  public:
-    // Intersect sphere with ray.
+    // A triangle has three corners
+    std::tuple< Eigen::Vector3d, Eigen::Vector3d, Eigen::Vector3d> corners;
+    // Intersect a triangle with ray.
     //
     // Inputs:
     //   Ray  ray to intersect with

@@ -2,30 +2,21 @@
 #include "Ray.h"
 
 bool Plane::intersect(
-  const Ray& ray,
-  const double min_t,
-  double & t,
-  Eigen::Vector3d & hit_p,
-  Eigen::Vector3d & n,
-  std::shared_ptr<Material> & mat,
-  Eigen::Vector3d & kd,
-  Eigen::Vector3d & ks,
-  Eigen::Vector3d & km,
-  double & p) const
+  const Ray & ray, const double min_t, HitInfo & hit_info) const
 {
   ////////////////////////////////////////////////////////////////////////////
   // Replace with your code here:
-  double a = (point - ray.origin).dot(this->normal);
-  double b = ray.direction.dot(this->normal);
-  t = a / b;
-  if (t >= min_t) {
-    hit_p = ray.origin + t * ray.direction;
-    n = this->normal;
-    mat = this->material;
-    kd = this->material->kd;
-    ks = this->material->ks;
-    km = this->material->km;
-    p = this->material->phong_exponent;
+  double a = (point - ray.origin).dot(normal);
+  double b = ray.direction.dot(normal);
+  hit_info.t = a / b;
+  if (hit_info.t >= min_t) {
+    hit_info.n = normal;
+    hit_info.ka = this->material->ka;
+    hit_info.kd = this->material->kd;
+    hit_info.ks = this->material->ks;
+    hit_info.km = this->material->km;
+    hit_info.hit_p = hit_info.t * ray.direction + ray.origin;
+    hit_info.phong_exponent = this->material->phong_exponent;
     return true;
   } else {
     return false;

@@ -23,5 +23,4 @@ bool ray_intersect_box(
   const Ray & ray,
   const BoundingBox& box,
   const double min_t);
-  //Eigen::Vector3d & n);
 #endif

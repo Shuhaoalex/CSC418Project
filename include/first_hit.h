@@ -7,7 +7,7 @@
 #include <Eigen/Core>
 #include <vector>
 #include <memory>
-#include <cmath>
+#include "Material.h"
 
 // Find the first (visible) hit given a ray and a collection of scene objects
 //
@@ -26,22 +26,6 @@ bool first_hit(
   const Ray & ray, 
   const double min_t,
   const std::vector< std::shared_ptr<Object> > & objects,
-  double & t,
-  Eigen::Vector3d & hit_point,
-  Eigen::Vector3d & n,
-  std::shared_ptr<Material> & material,
-  Eigen::Vector3d & kd,
-  Eigen::Vector3d & ks,
-  Eigen::Vector3d & km,
-  double & p);
-
-// simple wrapper around first_hit for checking shade
-bool check_shade(
-  const std::vector< std::shared_ptr<Object> > & objects,
-  const Eigen::Vector3d & hit_point,
-  const Eigen::Vector3d & direction,
-  double min_t,
-  double max_t  
-);
+  HitInfo & hit_info);
 
 #endif

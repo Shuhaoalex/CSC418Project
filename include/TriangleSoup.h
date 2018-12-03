@@ -1,17 +1,20 @@
-#ifndef SPHERE_H
-#define SPHERE_H
+#ifndef TRIANGLE_SOUP_H
+#define TRIANGLE_SOUP_H
 
-#include "Sphere.h"
 #include "Object.h"
 #include <Eigen/Core>
+#include <memory>
+#include <vector>
 
-class Sphere : public Object
+// Forward declaration
+class Triangle;
+class TriangleSoup : public Object
 {
   public:
-    Eigen::Vector3d center;
-    double radius;
-  public:
-    // Intersect sphere with ray.
+    // A soup is just a set (list) of triangles
+    std::vector<std::shared_ptr<Object> > triangles;
+
+    // Intersect a triangle soup with ray.
     //
     // Inputs:
     //   Ray  ray to intersect with
@@ -25,3 +28,4 @@ class Sphere : public Object
 };
 
 #endif
+

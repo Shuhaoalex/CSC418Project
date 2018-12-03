@@ -5,6 +5,7 @@
 #include <string>
 #include <memory>
 #include <unordered_map>
+#include <iostream>
 // Forward declaration
 struct Object;
 struct Light;
@@ -31,12 +32,13 @@ inline bool read_json(
 #include "Object.h"
 #include "Sphere.h"
 #include "Plane.h"
-#include "MeshTriangle.h"
-#include "TriangleMeshTree.h"
+#include "Triangle.h"
+#include "AABBTree.h"
 #include "Light.h"
 #include "PointLight.h"
 #include "DirectionalLight.h"
 #include "Material.h"
+#include "insert_triangle_into_box.h"
 #include <Eigen/Geometry>
 #include <fstream>
 #include <iostream>
@@ -134,6 +136,7 @@ inline bool read_json(
         std::shared_ptr<Sphere> sphere(new Sphere());
         sphere->center = parse_Vector3d(jobj["center"]);
         sphere->radius = jobj["radius"].get<double>();
+        sphere->material = materials[jobj["material"]];
         objects.push_back(sphere);
         sphere->material = materials[jobj["material"]];
       }else if(jobj["type"] == "plane")
@@ -141,13 +144,23 @@ inline bool read_json(
         std::shared_ptr<Plane> plane(new Plane());
         plane->point = parse_Vector3d(jobj["point"]);
         plane->normal = parse_Vector3d(jobj["normal"]).normalized();
+        plane->material = materials[jobj["material"]];
         objects.push_back(plane);
         plane->material = materials[jobj["material"]];
       }else if(jobj["type"] == "mesh")
       {
-        std::vector<std::vector<double> > t_V;
-        std::vector<std::vector<double> > t_F;
-        std::vector<std::vector<int> > t_N;
+        std::shared_ptr<Triangle> tri(new Triangle());
+        tri->corners = std::make_tuple(
+          parse_Vector3d(jobj["corners"][0]),
+          parse_Vector3d(jobj["corners"][1]),
+          parse_Vector3d(jobj["corners"][2]));
+        tri->material = materials[jobj["material"]];
+        objects.push_back(tri);
+      }else if(jobj["type"] == "soup")
+      {
+        std::vector<std::vector<double> > V;
+        std::vector<std::vector<double> > F;
+        std::vector<std::vector<int> > N;
         {
 #if defined(WIN32) || defined(_WIN32)
 #define PATH_SEPARATOR std::string("\\")
@@ -161,29 +174,25 @@ inline bool read_json(
               stl_path,
               t_V,t_F,t_N);
         }
-        Eigen::MatrixXd V(t_V.size(), 3);
-        Eigen::MatrixXi F(t_F.size(), 3);
-        for (int f = 0; f < t_F.size(); f++) {
-          F.row(f) << t_F[f][0], t_F[f][1], t_F[f][2];
-        }
-        for (int v = 0; v < t_V.size(); v++) {
-          V.row(v) << t_V[v][0], t_V[v][1], t_V[v][2];
-        }
-
-        std::vector<std::shared_ptr<Object> > triangles;
-        triangles.reserve(F.rows());
-        // Create a box for each triangle
-        for(int f = 0;f<F.rows();f++)
+        std::vector<std::shared_ptr<Object>> triangles;
+        for(int f = 0;f<F.size();f++)
         {
-          triangles.emplace_back( std::make_shared<MeshTriangle>(V,F,f, materials[jobj["material"]]) );
+          std::shared_ptr<Triangle> tri(new Triangle());
+          tri->corners = std::make_tuple(
+            Eigen::Vector3d( V[F[f][0]][0], V[F[f][0]][1], V[F[f][0]][2]),
+            Eigen::Vector3d( V[F[f][1]][0], V[F[f][1]][1], V[F[f][1]][2]),
+            Eigen::Vector3d( V[F[f][2]][0], V[F[f][2]][1], V[F[f][2]][2])
+          );
+          insert_triangle_into_box(std::get<0>(tri->corners), std::get<1>(tri->corners), std::get<2>(tri->corners), tri->box);
+          tri->material = materials[jobj["material"]];
+          triangles.push_back(tri);
         }
-        std::shared_ptr<TriangleMeshTree> root = std::make_shared<TriangleMeshTree>(triangles);
-        objects.push_back(root);
+        std::shared_ptr<AABBTree> soup(new AABBTree(triangles));
+        objects.push_back(soup);
       }
     }
   };
   parse_objects(j["objects"],objects);
-
   return true;
 }
 

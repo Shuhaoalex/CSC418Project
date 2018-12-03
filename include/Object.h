@@ -4,12 +4,14 @@
 #include "Material.h"
 #include <Eigen/Core>
 #include <memory>
+#include "HitInfo.h"
 #include "BoundingBox.h"
 
 struct Ray;
 class Object
 {
   public:
+    BoundingBox box;
     std::shared_ptr<Material> material;
     BoundingBox box;
     // https://stackoverflow.com/questions/461203/when-to-use-virtual-destructors
@@ -25,17 +27,7 @@ class Object
     //
     // The funny = 0 just ensures that this function is defined (as a no-op)
     virtual bool intersect(
-      const Ray& ray,
-      const double min_t,
-      double & t,
-      Eigen::Vector3d & hit_p,
-      Eigen::Vector3d & n,
-      std::shared_ptr<Material> & mat,
-      Eigen::Vector3d & kd,
-      Eigen::Vector3d & ks,
-      Eigen::Vector3d & km,
-      double & p) const = 0;
-    // virtual Eigen::Vector3d get_kd(Eigen::Vector2d & p) const = 0;
+        const Ray & ray, const double min_t, HitInfo & hit_info) const = 0;
 };
 
 #endif

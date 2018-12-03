@@ -13,20 +13,19 @@ bool raycolor(
 {
   ////////////////////////////////////////////////////////////////////////////
   // Replace with your code here:
-  std::shared_ptr<Material> mat;
-  double t, p;
-  Eigen::Vector3d hit_p, n, kd, ks, km;
-  if (first_hit(ray, min_t, objects, t, hit_p, n, mat, kd, ks, km, p)) {
-    rgb = blinn_phong_shading(ray, hit_p, n, kd, ks, p, objects, lights);
-    rgb += kd * 0.1;
+  HitInfo hit_info;
+  if (first_hit(ray, min_t, objects, hit_info)) {
+    rgb = blinn_phong_shading(ray, hit_info, objects, lights);
+    rgb += hit_info.ka;
 
     Eigen::Vector3d reflected_light_color;
     Ray reflected_light;
-    reflected_light.direction = reflect(ray.direction, n);
-    reflected_light.origin = hit_p;
-    if (std::pow(km(0), num_recursive_calls) > std::numeric_limits<double>::epsilon() * 100) {
+    reflected_light.direction = reflect(ray.direction, hit_info.n);
+    reflected_light.origin = hit_info.hit_p;
+    reflected_light.I = ray.I * hit_info.km.mean();
+    if (reflected_light.I > std::numeric_limits<double>::epsilon() * 100) {
       if (raycolor(reflected_light, 0.0001, objects, lights, num_recursive_calls + 1, reflected_light_color)){
-        rgb += (reflected_light_color.array() * km.array()).matrix();
+        rgb += (reflected_light_color.array() * (hit_info.km).array()).matrix();
       }
     }
     return true;

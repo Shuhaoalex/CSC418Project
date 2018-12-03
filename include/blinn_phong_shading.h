@@ -3,6 +3,7 @@
 #include "Ray.h"
 #include "Light.h"
 #include "Object.h"
+#include "HitInfo.h"
 #include <Eigen/Core>
 #include <vector>
 #include <memory>
@@ -22,11 +23,7 @@
 // Returns shaded color collected by this ray as rgb 3-vector
 Eigen::Vector3d blinn_phong_shading(
   const Ray & ray,
-  const Eigen::Vector3d & hit_point,
-  const Eigen::Vector3d & n,
-  const Eigen::Vector3d & kd,
-  const Eigen::Vector3d & ks,
-  const double & p,
+  const HitInfo & hit_info,
   const std::vector< std::shared_ptr<Object> > & objects,
   const std::vector<std::shared_ptr<Light> > & lights);
 

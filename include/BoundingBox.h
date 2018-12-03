@@ -18,7 +18,7 @@ struct BoundingBox
   { }
   Eigen::RowVector3d center()
   {
-      return 0.5*(max_corner + min_corner);
+    return 0.5*(max_corner + min_corner);
   }
 };
 #endif

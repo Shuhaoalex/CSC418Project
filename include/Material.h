@@ -10,12 +10,9 @@ struct Material
   Eigen::Vector3d kd,ks,km;
   // Phong exponent
   double phong_exponent;
-  // bool use_UV;
-  // int UV_width;
-  // int UV_height;
-  // std::vector<double> UV;
-  // bool will_refract;
-  // double refraction_rate;
-  // double color_satuate_rate;
+  bool use_UV;
+  std::vector<char> UV;
+  bool will_refract;
+  double refraction_rate;
 };
 #endif

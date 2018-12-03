@@ -1,0 +1,3 @@
+/h/u15/c7/00/lishuha2/CSC418Project/build-debug/CMakeFiles/edit_cache.dir
+/h/u15/c7/00/lishuha2/CSC418Project/build-debug/CMakeFiles/rebuild_cache.dir
+/h/u15/c7/00/lishuha2/CSC418Project/build-debug/CMakeFiles/raytracing.dir
