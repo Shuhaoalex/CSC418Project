@@ -10,4 +10,4 @@ By combinning these two techinichs together, we will be able to finish running a
 
 I also reconstructed the structure of the code so that it should be easy to get refraction and UV mapping implemented in the code (however, I failed to do so due to mysterious bug in my implementation). I implemented per_corner normal in Assignment 5 in order to show that my reconstruction on the code do make sense.
 
-![](build/rgb.ppm)
+![](rgb.png)
