@@ -166,6 +166,11 @@ inline bool read_json(
               obj_path,
               V,TC,N,F,FTC,FN);
         }
+        Eigen::RowVector3d transfer = parse_Vector3d(jobj["transfer"]).transpose();
+        Eigen::RowVector3d scale = parse_Vector3d(jobj["scale"]).transpose();
+        for (int i = 0; i < V.rows(); i++) {
+          V.row(i) = (V.row(i).array() * scale.array()).matrix() + transfer;
+        }
         V_l.push_back(V);
         F_l.push_back(F);
         per_corner_normals(V, F, 20, N);
