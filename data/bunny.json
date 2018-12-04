@@ -2,7 +2,7 @@
   "camera": {
     "type": "perspective",
     "focal_length": 1,
-    "eye": [0,0.3,10],
+    "eye": [0,0.3,5],
     "up": [0,1,0],
     "look": [0,0,-1],
     "height": 1,
@@ -47,13 +47,6 @@
   ],
 
   "objects": [
-    {
-      "type": "soup",
-      "material": "matte gray",
-      "obj": "bunny.obj",
-      "transfer":[0,0,0],
-      "scale":[1,1,1]
-    },
     {
       "type": "soup",
       "material": "matte gray",
