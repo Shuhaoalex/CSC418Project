@@ -66,7 +66,6 @@ int main(int argc, char * argv[])
     lights);
   int height = 1080;
   int width = 1920;
-
   std::vector<unsigned char> rgb_image(3*width*height);
   shared_arg shared(height, width, camera, objects, lights, rgb_image, NUM_THREAD);
   pthread_t threads[height];
