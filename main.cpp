@@ -13,7 +13,7 @@
 #include <functional>
 #include <pthread.h>
 #include "pthread_args.h"
-#define NUM_THREAD 40
+#define NUM_THREAD 8
 
 volatile int available_threads = NUM_THREAD;
 int buffer[NUM_THREAD];
