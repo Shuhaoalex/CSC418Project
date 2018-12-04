@@ -8,6 +8,6 @@ For the multi-thread programming part, the approch I used to parallelize the pro
 
 By combinning these two techinichs together, we will be able to finish running a ray tracing program on a bunny model with more than 13000 faces in less than 2 seconds.
 
-I also reconstructed the structure of the code so that it should be easy to get refraction and UV mapping implemented in the code (however, I failed to do so due to mysterious bug in my implementation). I implemented per_corner normal in Assignment 5 in order to show that my reconstruction on the code do make sense.
+I also reconstructed the structure of the code so that it should be easy to get refraction and UV mapping implemented in the code (however, I failed to do so due to mysterious bug in my implementation of these two parts). I implemented per_corner normal in Assignment 5 in order to show that my reconstruction on the code do make sense.
 
 ![](rgb.png)
